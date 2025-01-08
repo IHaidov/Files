@@ -50,7 +50,7 @@ namespace Files.App.Utils.Storage
 		{
 			try
 			{
-				using (var stream = request.AsStreamForWrite())
+				await using (var stream = request.AsStreamForWrite())
 				{
 					await Contents.CopyToAsync(stream);
 					await stream.FlushAsync();
@@ -119,18 +119,16 @@ namespace Files.App.Utils.Storage
 
 				if (destFolder is ICreateFileWithStream cwsf)
 				{
-					using var inStream = await this.OpenStreamForReadAsync();
+					await using var inStream = await this.OpenStreamForReadAsync();
 					return await cwsf.CreateFileAsync(inStream, desiredNewName, option.Convert());
 				}
 				else
 				{
 					var destFile = await destFolder.CreateFileAsync(desiredNewName, option.Convert());
-					using (var inStream = await this.OpenStreamForReadAsync())
-					using (var outStream = await destFile.OpenStreamForWriteAsync())
-					{
-						await inStream.CopyToAsync(outStream);
-						await outStream.FlushAsync();
-					}
+					await using var inStream = await this.OpenStreamForReadAsync();
+					await using var outStream = await destFile.OpenStreamForWriteAsync();
+					await inStream.CopyToAsync(outStream, cancellationToken);
+					await outStream.FlushAsync(cancellationToken);
 					return destFile;
 				}
 			});

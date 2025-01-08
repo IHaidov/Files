@@ -11,6 +11,7 @@ using Microsoft.Windows.ApplicationModel.Resources;
 using System.Collections.Concurrent;
 using Windows.Graphics;
 using Windows.Win32;
+using Windows.Win32.Foundation;
 
 namespace Files.App.Utils.Storage
 {
@@ -148,10 +149,13 @@ namespace Files.App.Utils.Storage
 			if (App.AppModel.IncrementPropertiesWindowCount() == 1)
 				PropertiesWindowsClosingTCS = new();
 
+			var hWnd = GetWindowHandle(propertiesWindow);
+			PInvoke.SetForegroundWindow((HWND)hWnd);
+
 			appWindow.Move(appWindowPos);
 			appWindow.Show();
 
-			(frame.Content as MainPropertiesPage)?.TryNavigateToPage(defaultPage);
+			//(frame.Content as MainPropertiesPage)?.TryNavigateToPage(defaultPage);
 		}
 
 		// Destruction of Window objects seems to cause access violation. (#12057)
@@ -160,17 +164,17 @@ namespace Files.App.Utils.Storage
 		{
 			if (!App.AppModel.IsMainWindowClosed && sender is WindowEx window)
 			{
-				args.Handled = true;
+				//args.Handled = true;
 
-				window.AppWindow.Hide();
-				window.Content = null;
-				WindowCache.Add(window);
+				//window.AppWindow.Hide();
+				//window.Content = null;
+				//WindowCache.Add(window);
 
-				if (App.AppModel.DecrementPropertiesWindowCount() == 0)
-				{
-					PropertiesWindowsClosingTCS!.TrySetResult();
-					PropertiesWindowsClosingTCS = null;
-				}
+				//if (App.AppModel.DecrementPropertiesWindowCount() == 0)
+				//{
+				//	PropertiesWindowsClosingTCS!.TrySetResult();
+				//	PropertiesWindowsClosingTCS = null;
+				//}
 			}
 			else
 				App.AppModel.DecrementPropertiesWindowCount();

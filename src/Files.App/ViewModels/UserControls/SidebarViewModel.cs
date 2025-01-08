@@ -885,10 +885,15 @@ namespace Files.App.ViewModels.UserControls
 			flyoutClosed = async (s, e) =>
 			{
 				menu.Closed -= flyoutClosed;
-				if (rightClickedItem is DriveItem)
-					FilePropertiesHelpers.OpenPropertiesWindow(rightClickedItem, PaneHolder.ActivePane);
+
+				if (rightClickedItem is DriveItem driveItem)
+				{
+					FilePropertiesHelpers.OpenPropertiesWindow(driveItem, PaneHolder.ActivePane);
+				}
 				else if (rightClickedItem is LibraryLocationItem library)
+				{
 					FilePropertiesHelpers.OpenPropertiesWindow(new LibraryItem(library), PaneHolder.ActivePane);
+				}
 				else if (rightClickedItem is LocationItem locationItem)
 				{
 					var listedItem = new ListedItem(null!)
@@ -912,8 +917,10 @@ namespace Files.App.ViewModels.UserControls
 					FilePropertiesHelpers.OpenPropertiesWindow(listedItem, PaneHolder.ActivePane);
 				}
 			};
+
 			menu.Closed += flyoutClosed;
 		}
+
 
 		private void EjectDevice()
 		{
